@@ -30,7 +30,6 @@ function Connection() {
 
     ws.onmessage = (evt) => {
       const message = JSON.parse(evt.data);
-      console.log('message ', message);
 
       if (message.type === "connected") {
         setLostConnection(false);
