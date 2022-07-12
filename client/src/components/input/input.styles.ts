@@ -12,14 +12,40 @@ export const Form = styled.form`
   right: 0;
   height: 200px;
   background-color: #f1f1f1;
-  z-index: ${getZIndex('input_form')};
+  z-index: ${getZIndex("input_form")};
 
   .input-container {
     display: flex;
+    position: relative;
     flex-direction: column;
     flex-grow: 1;
     max-width: 900px;
     margin: 0 auto;
+
+    .users-typing {
+      display: flex;
+      align-items: center;
+      position: absolute;
+      top: -21px;
+      left: -4px;
+      transform: translateY(-100%);
+      z-index: ${getZIndex("users_typing")};
+      font-size: 14px;
+      color: #959595;
+      font-weight: 100;
+      font-style: italic;
+      background-color: #f1f1f1;
+      border-radius: 0px;
+      padding-right: 14px;
+      height: 44px;
+      max-height: 44px;
+
+      svg {
+        width: 36px;
+        height: 36px;
+        margin-right: 4px;
+      }
+    }
 
     .textarea-container {
       display: flex;
@@ -41,8 +67,8 @@ export const Form = styled.form`
 
       span {
         position: absolute;
-        bottom: 8px;
-        right: 8px;
+        bottom: -27px;
+        right: 42px;
         font-size: 11px;
         font-style: italic;
         font-weight: 100;
@@ -53,6 +79,10 @@ export const Form = styled.form`
         &.show {
           opacity: 1;
         }
+      }
+
+      &:not(:focus-within) span {
+        opacity: 0;
       }
     }
 

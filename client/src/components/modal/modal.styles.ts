@@ -3,7 +3,7 @@ import { getZIndex } from "../../app.styles";
 
 export const Container = styled.div`
   position: fixed;
-  z-index: ${getZIndex('modal')};
+  z-index: ${getZIndex("modal")};
   top: 0;
   bottom: 0;
   left: 0;
@@ -16,7 +16,7 @@ export const Container = styled.div`
   .content {
     display: flex;
     flex-direction: column;
-    background: white;
+    background-color: white;
     padding: 60px;
     border-radius: 4px;
 

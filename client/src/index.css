@@ -15,14 +15,16 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Roboto', Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
 }
 
 #root {
   height: 100%;
 }
 
-button, input, textarea {
+button,
+input,
+textarea {
   border: 0;
   outline-color: rgba(69, 144, 255, 0.6);
 }

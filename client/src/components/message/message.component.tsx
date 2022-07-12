@@ -2,25 +2,26 @@ import { useGlobalState } from "../../store/store";
 import { Container, Content } from "./message.styles";
 
 interface MessageProps {
-  id: string;
-  name: string;
+  id?: string;
+  userId: string;
+  userName: string;
   message: string;
   timestamp: number;
-  onBothSides?: boolean;
+  shrink?: boolean;
 }
 
-function Message({ id, name, message, timestamp, onBothSides }: MessageProps) {
+function Message({ userId, userName, message, timestamp, shrink }: MessageProps) {
   const { user } = useGlobalState();
 
   const date = new Date(timestamp).toLocaleString();
 
   return (
-    <Container rightSide={user.id === id} onBothSides={onBothSides}>
-      <div className="avatar">{name.charAt(0)}</div>
+    <Container rightSide={user.id === userId} shrink={shrink}>
+      <div className="avatar">{userName.charAt(0)}</div>
       <Content>
-        <div>{message}</div>
+        <pre>{message}</pre>
         <p>
-          {name} | {date}
+          {userName} | {date}
         </p>
       </Content>
     </Container>

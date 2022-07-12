@@ -2,7 +2,7 @@ import styled, { css } from "styled-components";
 
 interface ContainerProps {
   rightSide?: boolean;
-  onBothSides?: boolean;
+  shrink?: boolean;
 }
 
 export const Container = styled.div<ContainerProps>`
@@ -37,14 +37,14 @@ export const Container = styled.div<ContainerProps>`
       : ""}
 
   ${(props) =>
-    props.onBothSides && !props.rightSide
+    props.shrink && !props.rightSide
       ? css`
           padding-right: 56px;
         `
       : ""}
 
   ${(props) =>
-    props.onBothSides && props.rightSide
+    props.shrink && props.rightSide
       ? css`
           padding-left: 56px;
         `

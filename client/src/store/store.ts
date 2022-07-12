@@ -19,5 +19,6 @@ const store = create((set) => {
 export const useGlobalState = () => {
   return context.useStore() as IState;
 };
+
 export const createStore = () => store;
 export const Provider = context.Provider;

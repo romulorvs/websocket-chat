@@ -22,7 +22,7 @@ function Modal() {
 
   const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement, Element>) => {
     setInputValue(e.target.value.trim());
-  },[]);
+  }, []);
 
   return (
     <Container>

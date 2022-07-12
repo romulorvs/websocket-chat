@@ -5,7 +5,8 @@ interface IUser {
 
 interface IMessage {
   id: string;
-  name: string;
+  userId: string;
+  userName: string;
   message: string;
   timestamp: number;
 }
@@ -13,15 +14,18 @@ interface IMessage {
 export const INITIAL_STATE: {
   user: IUser;
   messages: IMessage[];
+  usersTyping: String[];
 } = {
   user: {
     id: "",
-    name: ""
+    name: "",
   },
   messages: [],
+  usersTyping: [],
 };
 
 export type IState = typeof INITIAL_STATE & {
   setMessages: (newState: string) => void;
   setUser: (newState: IUser) => void;
+  setUsersTyping: (newState: string[]) => void;
 };

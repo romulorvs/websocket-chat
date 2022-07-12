@@ -33,11 +33,12 @@ export const Container = styled.main`
 `;
 
 const ZIndexes = {
-  input_form: 1,
-  modal: 2,
-  connection_modal: 3
-}
+  users_typing: 1,
+  input_form: 2,
+  modal: 3,
+  connection_modal: 4,
+};
 
 export const getZIndex = (attr: keyof typeof ZIndexes) => {
-  return ZIndexes[attr]
-}
+  return ZIndexes[attr];
+};

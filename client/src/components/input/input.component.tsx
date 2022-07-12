@@ -1,10 +1,14 @@
-import { useCallback, useState } from "react";
+import dbouncer from "dbouncer";
+import { useCallback, useEffect, useState } from "react";
 import { useGlobalState } from "../../store/store";
-import { SVGSend } from "../../svg";
+import { SVGAnimatedQuote, SVGSend } from "../../svg";
+import { sendRequest } from "../connection/connection.component";
 import { Form } from "./input.styles";
 
+const usersTypingDebouncer = dbouncer();
+
 function Input() {
-  const { user } = useGlobalState();
+  const { user, usersTyping, setUsersTyping, messages } = useGlobalState();
   const [inputValue, setInputValue] = useState("");
 
   const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
@@ -12,12 +16,14 @@ function Input() {
     if (!inputValue.trim()) {
       return;
     }
-    alert(inputValue.trim());
+    sendRequest("send_message", inputValue.trim());
+    setInputValue("");
   }, [inputValue]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
     setInputValue(value);
+    sendRequest("user_typing");
   }, []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -28,9 +34,30 @@ function Input() {
     }
   }, [inputValue]);
 
+  useEffect(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+  }, [messages]);
+
+  useEffect(() => {
+    if (usersTyping) {
+      usersTypingDebouncer(() => setUsersTyping([]), 4000);
+    }
+    console.log();
+  }, [usersTyping]);
+
   return (
     <Form onSubmit={handleSubmit}>
       <div className="input-container">
+        {!!usersTyping.length && (
+          <span className="users-typing">
+            {SVGAnimatedQuote}{" "}
+            {usersTyping.length === 1
+              ? `${usersTyping[0]} is typing...`
+              : usersTyping.length === 2
+              ? `${usersTyping[0]} and ${usersTyping[1]} are typing...`
+              : "3 or more people are typing..."}
+          </span>
+        )}
         <div className="textarea-container">
           <textarea
             value={inputValue}

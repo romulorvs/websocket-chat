@@ -1,22 +1,35 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Container } from "./app.styles";
 import { useGlobalState } from "./store/store";
-import { Connection, Input, Message, Modal } from "./components";
+import { Connection, Input, Message, Modal, sendRequest } from "./components";
 
 function App() {
   const { user, messages } = useGlobalState();
 
-  const messagesOnBothSides = useMemo(() => {
+  const hasMessagesOnBothSides = useMemo(() => {
     let hasUserId = false;
+    let hasOtherUserId = false;
+
     for (let i = 0; i < messages.length; i++) {
-      if (messages[i].id === user.id) {
+      if (messages[i].userId === user.id) {
         hasUserId = true;
-      } else if (hasUserId) {
+      } else {
+        hasOtherUserId = true;
+      }
+
+      if (hasUserId && hasOtherUserId) {
         return true;
       }
     }
+
     return false;
   }, [messages]);
+
+  useEffect(() => {
+    if (user.id) {
+      sendRequest("auth_user", user);
+    }
+  }, [user.id]);
 
   return (
     <>
@@ -28,14 +41,14 @@ function App() {
               <h3>This place feels a little empty. Why not start typing?</h3>
             </>
           )}
-          {messages.map(({ id, name, message, timestamp }) => (
+          {messages.map(({ id, userId, userName, message, timestamp }) => (
             <Message
               key={id}
-              id={id}
-              name={name}
+              userId={userId}
+              userName={userName}
               message={message}
               timestamp={timestamp}
-              onBothSides={messagesOnBothSides}
+              shrink={hasMessagesOnBothSides}
             />
           ))}
         </div>

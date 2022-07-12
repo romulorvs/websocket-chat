@@ -10,10 +10,13 @@
   "author": "RomuloVS",
   "license": "MIT",
   "devDependencies": {
+    "@types/uuid": "^8.3.4",
     "@types/ws": "^8.5.3",
     "ts-node-dev": "^2.0.0"
   },
   "dependencies": {
+    "dbouncer": "^0.2.2",
+    "uuid": "^8.3.2",
     "ws": "^8.8.0"
   }
 }
