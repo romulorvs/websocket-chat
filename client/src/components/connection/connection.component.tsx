@@ -1,5 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import { getZIndex } from "../../app.styles";
 import { useGlobalState } from "../../store/store";
+import { SVGSpinner } from "../../svg";
+import { blockActions } from "../../utils/preventAction";
 import { Container } from "./connection.styles";
 
 let ws: WebSocket | undefined;
@@ -17,28 +20,30 @@ export const sendRequest = (type: string, data?: any) => {
 };
 
 function Connection() {
-  const { setMessages, setUsersTyping, user } = useGlobalState();
-
-  const [connection, setConnection] = useState({
-    hasConnection: false,
-    lostConnection: false,
-  });
+  const { setMessages, setUsersTyping, user, isConnected, setIsConnected } = useGlobalState();
+  const { preventActions, restoreActions } = useMemo(() => blockActions(), []);
+  const [lostConnection, setLostConnection] = useState(false);
 
   const configConnection = useCallback(() => {
+    preventActions({ zIndex: getZIndex("connection_modal_background") });
     ws = new WebSocket(WS_URL);
 
     ws.onmessage = (evt) => {
       const message = JSON.parse(evt.data);
+      console.log('message ', message);
 
       if (message.type === "connected") {
-        setConnection({ hasConnection: true, lostConnection: false });
+        setLostConnection(false);
+        setIsConnected(true);
+
         if (user.id) {
           sendRequest("auth_user", user);
         }
+
+        restoreActions();
       }
 
       if (message.type === "update_messages") {
-        console.log("message.data", message.data);
         setMessages(message.data);
       }
 
@@ -46,17 +51,14 @@ function Connection() {
         setUsersTyping(message.data);
       }
     };
+  }, [isConnected, user.id]);
 
-    ws.onclose = reconnect;
-  }, []);
-
-  const reconnect = useCallback(() => {
-    if (connection.hasConnection) {
-      setConnection({ ...connection, lostConnection: true });
-    }
-
-    configConnection();
-  }, [connection]);
+  if(ws){
+    ws.onclose = () => {
+      setLostConnection(true);
+      configConnection();
+    };
+  }
 
   useEffect(() => {
     configConnection();
@@ -69,21 +71,21 @@ function Connection() {
     };
   }, []);
 
-  if (connection.hasConnection && !connection.lostConnection) {
+  if (isConnected && !lostConnection) {
     return null;
   }
 
-  if (connection.lostConnection) {
+  if(isConnected && lostConnection){
     return (
       <Container>
-        Connection Lost!
-        <br />
-        Reconnecting..
+        <h2>Connection Lost!</h2>
+        <h3>Reconnecting...</h3>
+        {SVGSpinner}
       </Container>
     );
   }
 
-  return <Container>connecting...</Container>;
+  return <Container>{SVGSpinner}</Container>;
 }
 
 export default Connection;

@@ -7,7 +7,6 @@ export const SVGSend = (
 export const SVGAnimatedQuote = (
   <svg viewBox="0 0 100 100">
     <path
-      xmlns="http://www.w3.org/2000/svg"
       d="M50 15C29.0537 15 12 21.4676 12 46.3217C12 56.6699 14.9659 63.8766 19.9707 68.6811C19.9707 72.6509 19.125 78 19.125 78C19.125 78 24.4688 76.217 30.3512 74.8716C36.0976 76.9042 42.7707 77.6434 50 77.6434C70.9463 77.6434 88 71.1758 88 46.3217C88 21.4676 70.9463 15 50 15Z"
       fill="#dbdbdb"
     />
@@ -36,6 +35,44 @@ export const SVGAnimatedQuote = (
         dur="1s"
         keyTimes="0;0.4;0.6;1"
         values="0;0;1;1"
+      />
+    </circle>
+  </svg>
+);
+
+export const SVGSpinner = (
+  <svg viewBox="0 0 100 100">
+    <circle
+      cx="50"
+      cy="50"
+      r="30"
+      stroke="rgba(255, 255, 255, 0.25)"
+      strokeWidth="12"
+      fill="none"
+    />
+    <circle
+      cx="50"
+      cy="50"
+      r="30"
+      stroke="#000000"
+      strokeWidth="12"
+      strokeLinecap="round"
+      fill="none"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        repeatCount="indefinite"
+        dur="1s"
+        values="0 50 50;180 50 50;720 50 50"
+        keyTimes="0;0.5;1"
+      />
+      <animate
+        attributeName="stroke-dasharray"
+        repeatCount="indefinite"
+        dur="1s"
+        values="18.84955592153876 169.64600329384882;94.2477796076938 94.24777960769377;18.84955592153876 169.64600329384882"
+        keyTimes="0;0.5;1"
       />
     </circle>
   </svg>

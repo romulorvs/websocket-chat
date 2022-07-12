@@ -1,10 +1,11 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Container } from "./app.styles";
 import { useGlobalState } from "./store/store";
 import { Connection, Input, Message, Modal, sendRequest } from "./components";
 
 function App() {
-  const { user, messages } = useGlobalState();
+  const pageContentRef = useRef<HTMLElement>(null)
+  const { user, messages, isConnected, setPageContentRef } = useGlobalState();
 
   const hasMessagesOnBothSides = useMemo(() => {
     let hasUserId = false;
@@ -31,9 +32,13 @@ function App() {
     }
   }, [user.id]);
 
+  useEffect(() => {
+    setPageContentRef(pageContentRef)
+  },[pageContentRef])
+
   return (
     <>
-      <Container>
+      <Container ref={pageContentRef}>
         <div className="messages-container">
           {!messages.length && !!user.id && (
             <>
@@ -54,7 +59,7 @@ function App() {
         </div>
         <Input />
       </Container>
-      {!user.id && <Modal />}
+      {!user.id && isConnected && <Modal />}
       <Connection />
     </>
   );

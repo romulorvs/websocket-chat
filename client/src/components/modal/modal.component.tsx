@@ -1,11 +1,14 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { useGlobalState } from "../../store/store";
+import { blockActions } from "../../utils/preventAction";
 import { Container } from "./modal.styles";
 
 function Modal() {
-  const { user, setUser } = useGlobalState();
+  const { user, setUser, pageContentRef } = useGlobalState();
   const [inputValue, setInputValue] = useState("");
+
+  const { preventActions, restoreActions } = useMemo(() => blockActions(), []);
 
   const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,8 +23,20 @@ function Modal() {
     setInputValue(e.target.value.trimStart());
   }, []);
 
-  const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement, Element>) => {
-    setInputValue(e.target.value.trim());
+  const handleBlur = useCallback(
+    (e: React.FocusEvent<HTMLInputElement, Element>) => {
+      setInputValue(e.target.value.trim());
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (pageContentRef?.current) {
+      preventActions({ container: pageContentRef?.current });
+    }
+    return () => {
+      restoreActions();
+    }
   }, []);
 
   return (
@@ -35,7 +50,6 @@ function Modal() {
             value={inputValue}
             onChange={handleChange}
             onBlur={handleBlur}
-            autoFocus
           />
         </label>
         <div className="button-container">

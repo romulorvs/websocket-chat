@@ -42,7 +42,6 @@ function Input() {
     if (usersTyping) {
       usersTypingDebouncer(() => setUsersTyping([]), 4000);
     }
-    console.log();
   }, [usersTyping]);
 
   return (
@@ -62,7 +61,6 @@ function Input() {
           <textarea
             value={inputValue}
             onChange={handleChange}
-            disabled={!user.id}
             onKeyDown={handleKeyDown}
             placeholder="write your message..."
           />

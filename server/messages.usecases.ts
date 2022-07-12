@@ -5,19 +5,19 @@ export class MessageUseCases {
 
   constructor(
     private connection: CustomWebSocket,
-    private connections: CustomWebSocket[],
+    private connections: Set<CustomWebSocket>,
     private message: Message,
     private usersTyping: Set<string>,
-    private messages: Messages[],
+    private storedMessages: Messages[],
     private connectedUsers: ConnectedUsers,
     private removeUsersTypingDebounce: Dbouncer
   ) {
     console.log(`--------\nuser "${connection.currentUserId}" requests "${message.type}"`);
-    console.log("message ", message);
+    console.log("message: ", message);
   }
 
   send(res: any, connection = this.connection) {
-    console.log(`response to "${connection.currentUserId}" | response: `, res, "\n");
+    console.log(`responding to "${connection.currentUserId}"\nresponse: `, res, "\n");
     connection.send(JSON.stringify(res));
   }
 
@@ -28,6 +28,7 @@ export class MessageUseCases {
 
       const userNames: String[] = [];
       usersTypingClone.forEach((userId) => {
+        if(!this.connectedUsers[userId]) return;
         userNames.push(this.connectedUsers[userId].name);
       });
 
@@ -43,7 +44,7 @@ export class MessageUseCases {
   updateMessagesUC(connection?: CustomWebSocket) {
     const res = {
       type: "update_messages",
-      data: this.messages,
+      data: this.storedMessages,
     }
 
     this.send(res, connection);
@@ -56,16 +57,13 @@ export class MessageUseCases {
   }
 
   handleUserTypingUC() {
-    if (!this.connection.currentUserId) return;
     this.usersTyping.add(this.connection.currentUserId);
     this.removeUsersTypingDebounce(() => this.usersTyping.delete(this.connection.currentUserId), 5000);
     this.updateUsersTyping();
   }
 
   sendMessageUC() {
-    if (!this.connection.currentUserId) return;
-
-    this.messages.push({
+    this.storedMessages.push({
       id: uuid(),
       userId: this.connection.currentUserId,
       userName: this.connectedUsers[this.connection.currentUserId].name,
@@ -79,5 +77,14 @@ export class MessageUseCases {
 
     this.usersTyping.delete(this.connection.currentUserId);
     this.updateUsersTyping();
+  }
+
+  execute() {
+    if(this.message.type === "auth_user") return this.authorizeUserUC();
+
+    if (!this.connection.currentUserId) return;
+    if(this.message.type === "update_messages") return this.updateMessagesUC();
+    if(this.message.type === "user_typing") return this.handleUserTypingUC();
+    if(this.message.type === "send_message") return this.sendMessageUC();
   }
 }
