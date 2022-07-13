@@ -8,7 +8,7 @@ import { Form } from "./input.styles";
 const usersTypingDebouncer = dbouncer();
 
 function Input() {
-  const { user, usersTyping, setUsersTyping, messages } = useGlobalState();
+  const { usersTyping, setUsersTyping, messages } = useGlobalState();
   const [inputValue, setInputValue] = useState("");
 
   const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {

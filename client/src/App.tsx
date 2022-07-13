@@ -2,10 +2,13 @@ import { useEffect, useMemo, useRef } from "react";
 import { Container } from "./app.styles";
 import { useGlobalState } from "./store/store";
 import { Connection, Input, Message, Modal, sendRequest } from "./components";
+import { blockActions } from "./utils/preventAction";
 
 function App() {
   const pageContentRef = useRef<HTMLElement>(null)
-  const { user, messages, isConnected, setPageContentRef } = useGlobalState();
+
+  const { preventActions, restoreActions } = useMemo(() => blockActions(), []);
+  const { user, messages, isConnected, actionsToPrevent, setActionsToPrevent } = useGlobalState();
 
   const hasMessagesOnBothSides = useMemo(() => {
     let hasUserId = false;
@@ -33,8 +36,16 @@ function App() {
   }, [user.id]);
 
   useEffect(() => {
-    setPageContentRef(pageContentRef)
-  },[pageContentRef])
+    if (pageContentRef?.current) {
+      setActionsToPrevent({
+        ...actionsToPrevent,
+        "preventOnModal": {
+          preventActions: () => preventActions((pageContentRef.current as HTMLElement)),
+          restoreActions
+        }
+      })
+    }
+  }, [])
 
   return (
     <>

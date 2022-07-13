@@ -11,21 +11,27 @@ interface IMessage {
   timestamp: number;
 }
 
-export const INITIAL_STATE: {
+interface IPreventActions {
+  [key: string]: {
+    preventActions: (...args: any) => void;
+    restoreActions: (...args: any) => void;
+  };
+}
+
+interface StateProps {
   user: IUser;
   messages: IMessage[];
   usersTyping: String[];
   isConnected: boolean;
-  pageContentRef?: React.RefObject<HTMLElement>;
-} = {
-  user: {
-    id: "",
-    name: "",
-  },
+  actionsToPrevent: IPreventActions;
+}
+
+export const INITIAL_STATE: StateProps = {
+  user: { id: "", name: "" },
   messages: [],
   usersTyping: [],
   isConnected: false,
-  pageContentRef: undefined
+  actionsToPrevent: {}
 };
 
 export type IState = typeof INITIAL_STATE & {
@@ -33,5 +39,5 @@ export type IState = typeof INITIAL_STATE & {
   setUser: (newState: IUser) => void;
   setUsersTyping: (newState: string[]) => void;
   setIsConnected: (newState: boolean) => void;
-  setPageContentRef: (newState: React.RefObject<HTMLElement>) => void;
+  setActionsToPrevent: (newState: IPreventActions) => void;
 };

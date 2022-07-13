@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from "react";
-import { getZIndex } from "../../app.styles";
+import { useEffect, useMemo } from "react";
 import { useGlobalState } from "../../store/store";
 import { SVGSpinner } from "../../svg";
 import { blockActions } from "../../utils/preventAction";
@@ -9,37 +8,39 @@ let ws: WebSocket | undefined;
 const WS_URL = "ws://localhost:3001";
 
 export const sendRequest = (type: string, data?: any) => {
-  if (ws && ws.readyState === ws.OPEN) {
-    ws.send(
-      JSON.stringify({
-        type,
-        data,
-      })
-    );
+  if (ws && ws.readyState === ws.OPEN) { 
+    ws.send(JSON.stringify({ type, data, }));
   }
 };
 
 function Connection() {
-  const { setMessages, setUsersTyping, user, isConnected, setIsConnected } = useGlobalState();
+  const { setMessages, setUsersTyping, user, isConnected, setIsConnected, actionsToPrevent } = useGlobalState();
   const { preventActions, restoreActions } = useMemo(() => blockActions(), []);
-  const [lostConnection, setLostConnection] = useState(false);
 
-  const configConnection = useCallback(() => {
-    preventActions({ zIndex: getZIndex("connection_modal_background") });
+  const configConnection = () => {
+    actionsToPrevent.preventOnModal?.restoreActions();
+    preventActions();
     ws = new WebSocket(WS_URL);
+  }
 
+  if (ws) {
     ws.onmessage = (evt) => {
       const message = JSON.parse(evt.data);
 
       if (message.type === "connected") {
-        setLostConnection(false);
         setIsConnected(true);
-
-        if (user.id) {
-          sendRequest("auth_user", user);
-        }
-
         restoreActions();
+
+        if (user.id){
+          sendRequest("auth_user", user);
+        } else {
+          actionsToPrevent.preventOnModal?.preventActions();
+        }
+      }
+
+      if(message.type === "auth_user"){
+        actionsToPrevent.preventOnModal?.restoreActions();
+        sendRequest("update_messages");
       }
 
       if (message.type === "update_messages") {
@@ -50,12 +51,10 @@ function Connection() {
         setUsersTyping(message.data);
       }
     };
-  }, [isConnected, user.id]);
 
-  if(ws){
     ws.onclose = () => {
-      setLostConnection(true);
       configConnection();
+      setIsConnected(false);
     };
   }
 
@@ -70,21 +69,16 @@ function Connection() {
     };
   }, []);
 
-  if (isConnected && !lostConnection) {
+  if (isConnected) {
     return null;
   }
 
-  if(isConnected && lostConnection){
-    return (
-      <Container>
-        <h2>Connection Lost!</h2>
-        <h3>Reconnecting...</h3>
-        {SVGSpinner}
-      </Container>
-    );
-  }
-
-  return <Container>{SVGSpinner}</Container>;
+  return (
+    <Container>
+      <h3>Connecting...</h3>
+      {SVGSpinner}
+    </Container>
+  );
 }
 
 export default Connection;

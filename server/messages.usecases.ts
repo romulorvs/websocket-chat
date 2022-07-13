@@ -53,7 +53,8 @@ export class MessageUseCases {
   authorizeUserUC() {
     this.connection.currentUserId = this.message.data.id;
     this.connectedUsers[this.message.data.id] = this.message.data;
-    this.updateMessagesUC();
+
+    this.send({ type: "auth_user" });
   }
 
   handleUserTypingUC() {

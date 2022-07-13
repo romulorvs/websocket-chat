@@ -35,10 +35,8 @@ export const Container = styled.main`
 const ZIndexes = {
   users_typing: 1,
   input_form: 2,
-  modal_background: 3,
-  modal: 4,
-  connection_modal_background: 5,
-  connection_modal: 6,
+  modal: 3,
+  connection_modal: 4,
 };
 
 export const getZIndex = (attr: keyof typeof ZIndexes) => {

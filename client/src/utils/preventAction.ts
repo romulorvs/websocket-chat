@@ -1,34 +1,17 @@
-type CustomElement = Element & {
-  ogTabIndex: string | null;
-  ogDisabled: string | null;
-};
-
-type PreventActionsParams = {
-  container?: HTMLElement;
-  zIndex?: number;
-};
-
 export const blockActions = () => {
-  let clickableElements: NodeListOf<CustomElement> | undefined;
+  let clickableElements: NodeListOf<Element> | undefined;
 
-  const elements = new Map<CustomElement, { ogTabIndex: string | null; ogDisabled: string | null; }>();
-
-  const coverElement = document.createElement("div");
-  coverElement.style.position = "fixed";
-  coverElement.style.top = "0";
-  coverElement.style.left = "0";
-  coverElement.style.bottom = "0";
-  coverElement.style.right = "0";
+  const elements = new Map<Element, { ogTabIndex: string | null; ogDisabled: string | null }>();
 
   let currentContainer: HTMLElement | undefined;
 
-  const preventActions = ({ container = document.body, zIndex }: PreventActionsParams = {}) => {
+  const preventActions = (container = document.body) => {
     restoreActions();
     currentContainer = container;
 
-    if (typeof zIndex === "undefined") coverElement.style.zIndex = `${zIndex}`;
-
-    clickableElements = currentContainer.querySelectorAll("input, textarea, button, select, a");
+    clickableElements = currentContainer.querySelectorAll(
+      'input, textarea, button, select, a, details, area, frame, iframe, [contentEditable=""], [contentEditable="true"], [contentEditable="TRUE"], [tabindex]:not([tabindex^="-"])'
+    );
 
     clickableElements.forEach((el) => {
       const ogTabIndex = el.getAttribute("tabindex");
@@ -40,18 +23,6 @@ export const blockActions = () => {
       el.setAttribute("tabindex", "-1");
       el.setAttribute("disabled", "disabled");
     });
-
-    const activeElement = document.activeElement as typeof document.activeElement & { blur: Function };
-
-    if (activeElement) {
-      clickableElements?.forEach((el) => {
-        if (el === (activeElement as Element)) {
-          activeElement.blur();
-        }
-      });
-    }
-
-    currentContainer.appendChild(coverElement);
   };
 
   const restoreActions = () => {
@@ -67,14 +38,12 @@ export const blockActions = () => {
           else el.setAttribute("disabled", elements.get(el)?.ogDisabled || "");
         });
 
-        currentContainer?.removeChild(coverElement);
+        clickableElements = undefined;
       }
     } catch (error) {
       if (!(error instanceof DOMException)) {
         throw error;
       }
-    } finally {
-      clickableElements = undefined;
     }
   };
 
