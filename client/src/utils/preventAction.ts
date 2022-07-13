@@ -1,13 +1,18 @@
 export const blockActions = () => {
   let clickableElements: NodeListOf<Element> | undefined;
-
   const elements = new Map<Element, { ogTabIndex: string | null; ogDisabled: string | null }>();
-
   let currentContainer: HTMLElement | undefined;
 
-  const preventActions = (container = document.body) => {
+  const preventActions = (container: HTMLElement | string = document.body) => {
     restoreActions();
-    currentContainer = container;
+
+    if(typeof container === "string"){
+      const element = document.querySelector(container)
+      if(!element) return;
+      currentContainer = element as HTMLElement
+    } else {
+      currentContainer = container
+    }
 
     clickableElements = currentContainer.querySelectorAll(
       'input, textarea, button, select, a, details, area, frame, iframe, [contentEditable=""], [contentEditable="true"], [contentEditable="TRUE"], [tabindex]:not([tabindex^="-"])'
@@ -41,7 +46,9 @@ export const blockActions = () => {
         clickableElements = undefined;
       }
     } catch (error) {
-      if (!(error instanceof DOMException)) {
+      if (error instanceof DOMException) {
+        clickableElements = undefined;
+      } else {
         throw error;
       }
     }
