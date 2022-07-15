@@ -9,6 +9,11 @@ export const blockActions = () => {
     ogPointerEvents: string;
   }>();
 
+  function preventActionFn(e: Event) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
   const preventActions = (container: HTMLElement | Element | string = document.body) => {
     restoreActions();
 
@@ -43,10 +48,36 @@ export const blockActions = () => {
       el.setAttribute("disabled", "disabled");
       el.style.pointerEvents = "none";
     }
+
+    currentContainer.addEventListener("mousedown", preventActionFn, true);
+    currentContainer.addEventListener("mouseup", preventActionFn, true);
+    currentContainer.addEventListener("select", preventActionFn, true);
+    currentContainer.addEventListener("touchstart", preventActionFn, true);
+    currentContainer.addEventListener("touchend", preventActionFn, true);
+    currentContainer.addEventListener("click", preventActionFn, true);
+    currentContainer.addEventListener("dblclick", preventActionFn, true);
+    currentContainer.addEventListener("drag", preventActionFn, true);
+    currentContainer.addEventListener("drop", preventActionFn, true);
+    currentContainer.addEventListener("keydown", preventActionFn, true);
+    currentContainer.addEventListener("keypress", preventActionFn, true);
+    currentContainer.addEventListener("keyup", preventActionFn, true);
   };
 
   const restoreActions = () => {
     try {
+      currentContainer?.removeEventListener("mousedown", preventActionFn, true);
+      currentContainer?.removeEventListener("mouseup", preventActionFn, true);
+      currentContainer?.removeEventListener("select", preventActionFn, true);
+      currentContainer?.removeEventListener("touchstart", preventActionFn, true);
+      currentContainer?.removeEventListener("touchend", preventActionFn, true);
+      currentContainer?.removeEventListener("click", preventActionFn, true);
+      currentContainer?.removeEventListener("dblclick", preventActionFn, true);
+      currentContainer?.removeEventListener("drag", preventActionFn, true);
+      currentContainer?.removeEventListener("drop", preventActionFn, true);
+      currentContainer?.removeEventListener("keydown", preventActionFn, true);
+      currentContainer?.removeEventListener("keypress", preventActionFn, true);
+      currentContainer?.removeEventListener("keyup", preventActionFn, true);
+
       if (clickableElements?.length) {
         for (let i = 0; i < clickableElements.length; i++) {
           const el = clickableElements[i];
