@@ -1,14 +1,14 @@
+import preventActions from "prevent-action";
 import { useEffect } from "react";
 import { useGlobalState } from "../../store/store";
 import { SVGSpinner } from "../../svg";
-import { blockActions } from "../../utils/preventAction";
 import { Container } from "./connection.styles";
 
 let ws: WebSocket | undefined;
 const WS_URL = "ws://localhost:3001";
 
-const preventOnModal = blockActions();
-const preventOnConnection = blockActions();
+const [ preventOnModal, restoreOnModal ] = preventActions();
+const [ preventOnConnection, restoreOnConnection ] = preventActions();
 
 export const sendRequest = (type: string, data?: any) => {
   if (ws && ws.readyState === ws.OPEN) { 
@@ -26,17 +26,17 @@ function Connection() {
 
         if (message.type === "connected") {
           setIsConnected(true);
-          preventOnConnection.restoreActions();
+          restoreOnConnection();
           
           if (user.id){
             sendRequest("auth_user", user);
           } else {
-            preventOnModal.preventActions("#page-content");
+            preventOnModal("#page-content");
           }
         }
 
         if(message.type === "auth_user"){
-          preventOnModal.restoreActions();
+          restoreOnModal();
           sendRequest("update_messages");
         }
 
@@ -57,8 +57,8 @@ function Connection() {
   }
 
   const configConnection = () => {
-    preventOnModal.restoreActions();
-    preventOnConnection.preventActions();
+    restoreOnModal();
+    preventOnConnection();
     ws = new WebSocket(WS_URL);
     setWsEvents();
   }
