@@ -81,7 +81,7 @@ function Connection() {
   }
 
   return (
-    <Container onDoubleClick={e => {}} onDrag={e => {}} onDrop={e => {}} onKeyDown={e => {}} onMouseDown={e => {}}>
+    <Container>
       <h3>Connecting...</h3>
       {SVGSpinner}
     </Container>
